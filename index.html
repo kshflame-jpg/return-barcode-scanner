@@ -1,185 +1,985 @@
 <!DOCTYPE html>
-<html lang="ko">
-
+<html>
 <head>
+
+  <base target="_top">
 
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
   >
 
-  <title>반품 상품 바코드 스캐너</title>
-
-
-  <!--
-    실시간 바코드 인식 라이브러리
-  -->
-  <script
-    src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
-  </script>
+  <title>반품 상품 조회기</title>
 
 
   <style>
 
-    * {
-      box-sizing: border-box;
+    /* =====================================================
+       기본
+    ===================================================== */
+
+    :root {
+
+      --bg: #eef1f4;
+
+      --white: #ffffff;
+
+      --text: #111827;
+
+      --muted: #667085;
+
+      --line: #dfe3e8;
+
+      --primary: #111827;
+
+      --success: #027a48;
+
+      --danger: #b42318;
+
     }
 
+
+    * {
+
+      box-sizing: border-box;
+
+      -webkit-tap-highlight-color: transparent;
+
+    }
+
+
+    html,
     body {
+
+      width: 100%;
+
+      min-width: 100%;
+
+      min-height: 100%;
+
       margin: 0;
-      background: #f5f6f8;
-      color: #1f2937;
+
+      padding: 0;
+
+      background: var(--bg);
+
+      color: var(--text);
+
       font-family:
-        Arial,
+
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
         "Noto Sans KR",
         "Malgun Gothic",
+        Arial,
         sans-serif;
+
+      -webkit-text-size-adjust: 100%;
+
     }
 
-    .wrap {
+
+    body {
+
+      min-height: 100dvh;
+
+      overflow-x: hidden;
+
+    }
+
+
+    button,
+    input {
+
+      font: inherit;
+
+    }
+
+
+
+    /* =====================================================
+       전체 앱
+
+       실제 휴대폰 화면 전체를 사용
+    ===================================================== */
+
+    .app {
+
       width: 100%;
-      max-width: 620px;
-      margin: 0 auto;
-      padding: 18px 12px 40px;
+
+      min-height: 100dvh;
+
+      display: flex;
+
+      flex-direction: column;
+
     }
 
-    h1 {
-      margin: 5px 0 5px;
-      font-size: 24px;
-      font-weight: 800;
+
+
+    /* =====================================================
+       상단 헤더
+    ===================================================== */
+
+    .header {
+
+      flex: 0 0 auto;
+
+      padding:
+        18px
+        16px
+        15px;
+
+      background:
+        var(--white);
+
+      border-bottom:
+        1px
+        solid
+        var(--line);
+
     }
 
-    .sub {
-      margin-bottom: 16px;
-      color: #667085;
-      font-size: 13px;
+
+    .header-title {
+
+      margin: 0;
+
+      font-size:
+        clamp(28px, 8vw, 38px);
+
+      line-height: 1.15;
+
+      font-weight: 950;
+
+      letter-spacing:
+        -1.2px;
+
     }
 
-    .panel {
-      padding: 16px;
-      margin-bottom: 14px;
-      border-radius: 18px;
-      background: #ffffff;
+
+    .header-subtitle {
+
+      margin-top: 5px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        clamp(14px, 4vw, 18px);
+
+      font-weight: 700;
+
+    }
+
+
+
+    /* =====================================================
+       메인 영역
+    ===================================================== */
+
+    .main {
+
+      flex:
+        1 1 auto;
+
+      min-height: 0;
+
+      display: flex;
+
+      flex-direction: column;
+
+      padding:
+        12px;
+
+      gap:
+        12px;
+
+    }
+
+
+
+    /* =====================================================
+       검색영역
+
+       기존보다 훨씬 크게
+    ===================================================== */
+
+    .search-panel {
+
+      flex:
+        0 0 auto;
+
+      padding:
+        16px;
+
+      background:
+        var(--white);
+
+      border:
+        1px
+        solid
+        var(--line);
+
+      border-radius:
+        18px;
+
       box-shadow:
-        0 4px 18px rgba(0, 0, 0, 0.06);
+        0
+        3px
+        12px
+        rgba(
+          16,
+          24,
+          40,
+          0.05
+        );
+
     }
 
-    .title {
-      margin-bottom: 8px;
-      font-size: 17px;
-      font-weight: 800;
+
+    .search-label {
+
+      margin-bottom:
+        9px;
+
+      color:
+        #344054;
+
+      font-size:
+        clamp(20px, 5.5vw, 26px);
+
+      line-height:
+        1.2;
+
+      font-weight:
+        900;
+
     }
 
-    .description {
-      margin-bottom: 14px;
-      color: #667085;
-      font-size: 12px;
-      line-height: 1.6;
+
+    .barcode-input {
+
+      width:
+        100%;
+
+      height:
+        clamp(62px, 16vw, 82px);
+
+      padding:
+        0
+        18px;
+
+      border:
+        2px
+        solid
+        #c7cdd5;
+
+      border-radius:
+        14px;
+
+      background:
+        #ffffff;
+
+      color:
+        #111827;
+
+      font-size:
+        clamp(24px, 7vw, 34px);
+
+      font-weight:
+        800;
+
+      letter-spacing:
+        0.5px;
+
+      outline:
+        none;
+
     }
 
-    #reader {
-      width: 100%;
-      overflow: hidden;
-      border-radius: 14px;
-      background: #111827;
+
+    .barcode-input:focus {
+
+      border-color:
+        #7b8490;
+
+      box-shadow:
+        0
+        0
+        0
+        4px
+        rgba(
+          17,
+          24,
+          39,
+          0.07
+        );
+
     }
 
-    #reader video {
-      width: 100% !important;
-      height: auto !important;
-      object-fit: cover;
+
+    .search-btn {
+
+      width:
+        100%;
+
+      height:
+        clamp(62px, 16vw, 82px);
+
+      margin-top:
+        11px;
+
+      border:
+        0;
+
+      border-radius:
+        14px;
+
+      background:
+        var(--primary);
+
+      color:
+        white;
+
+      font-size:
+        clamp(22px, 6vw, 30px);
+
+      font-weight:
+        950;
+
+      cursor:
+        pointer;
+
     }
 
-    .guide {
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 12px;
-      background: #f2f4f7;
-      text-align: center;
-      color: #475467;
-      font-size: 13px;
-      line-height: 1.6;
-    }
 
     .status {
-      min-height: 24px;
-      margin-top: 12px;
-      text-align: center;
-      color: #667085;
-      font-size: 13px;
-      line-height: 1.5;
+
+      min-height:
+        20px;
+
+      margin-top:
+        8px;
+
+      color:
+        var(--muted);
+
+      font-size:
+        14px;
+
+      font-weight:
+        700;
+
+      line-height:
+        1.5;
+
     }
 
-    .success {
-      color: #027a48;
-      font-weight: 800;
+
+    .success-status {
+
+      color:
+        var(--success);
+
+      font-weight:
+        900;
+
     }
 
-    .error {
-      margin-top: 10px;
-      padding: 12px;
-      border-radius: 12px;
-      background: #fef3f2;
-      color: #b42318;
-      font-size: 13px;
-      line-height: 1.6;
+
+
+    /* =====================================================
+       결과 영역
+
+       화면 남은 공간을 최대한 사용
+    ===================================================== */
+
+    #resultArea {
+
+      flex:
+        1 1 0;
+
+      min-height:
+        0;
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
     }
 
-    .manual-title {
-      margin-bottom: 8px;
-      font-size: 15px;
-      font-weight: 800;
-    }
 
-    .manual-description {
-      margin-bottom: 10px;
-      color: #667085;
-      font-size: 12px;
-      line-height: 1.6;
-    }
 
-    .input {
-      width: 100%;
-      height: 54px;
-      padding: 0 14px;
+    /* =====================================================
+       검색 전 화면
+    ===================================================== */
+
+    .empty-state {
+
+      flex:
+        1 1 auto;
+
+      min-height:
+        250px;
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      justify-content:
+        center;
+
+      padding:
+        25px;
+
+      background:
+        rgba(
+          255,
+          255,
+          255,
+          0.68
+        );
+
       border:
-        1px solid #d0d5dd;
-      border-radius: 12px;
-      outline: none;
-      font-size: 19px;
+        2px
+        dashed
+        #d0d5dd;
+
+      border-radius:
+        18px;
+
+      text-align:
+        center;
+
+      color:
+        #667085;
+
+      font-size:
+        clamp(17px, 5vw, 22px);
+
+      line-height:
+        1.7;
+
+      font-weight:
+        700;
+
     }
 
-    .input:focus {
-      border-color: #667085;
+
+
+    /* =====================================================
+       결과 건수
+    ===================================================== */
+
+    .result-count {
+
+      flex:
+        0 0 auto;
+
+      padding:
+        0
+        4px;
+
+      color:
+        #667085;
+
+      font-size:
+        14px;
+
+      font-weight:
+        700;
+
     }
 
-    .btn {
-      width: 100%;
-      height: 52px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 800;
-      cursor: pointer;
-    }
 
-    .btn-main {
-      background: #111827;
-      color: white;
-    }
 
-    .info {
-      padding: 12px;
+    /* =====================================================
+       상품 대시보드
+
+       가장 큰 영역
+    ===================================================== */
+
+    .product-dashboard {
+
+      flex:
+        1 1 0;
+
+      min-height:
+        0;
+
+      display:
+        flex;
+
+      flex-direction:
+        column;
+
+      padding:
+        17px;
+
+      background:
+        var(--white);
+
       border:
-        1px solid #e4e7ec;
-      border-radius: 12px;
-      color: #667085;
-      background: white;
-      font-size: 12px;
-      line-height: 1.6;
+        1px
+        solid
+        var(--line);
+
+      border-radius:
+        20px;
+
+      box-shadow:
+        0
+        4px
+        16px
+        rgba(
+          16,
+          24,
+          40,
+          0.06
+        );
+
+      overflow:
+        hidden;
+
+    }
+
+
+
+    /* =====================================================
+       상품명
+    ===================================================== */
+
+    .product-name {
+
+      margin:
+        0;
+
+      color:
+        #0f172a;
+
+      font-size:
+        clamp(28px, 8vw, 40px);
+
+      line-height:
+        1.28;
+
+      font-weight:
+        950;
+
+      letter-spacing:
+        -1px;
+
+      word-break:
+        keep-all;
+
+      overflow-wrap:
+        anywhere;
+
+    }
+
+
+    .product-barcode {
+
+      margin-top:
+        6px;
+
+      color:
+        #98a2b3;
+
+      font-size:
+        13px;
+
+      font-weight:
+        700;
+
+      word-break:
+        break-all;
+
+    }
+
+
+
+    /* =====================================================
+       가격
+
+       화면에서 가장 크게
+    ===================================================== */
+
+    .price-area {
+
+      margin-top:
+        15px;
+
+      padding:
+        18px
+        17px
+        19px;
+
+      background:
+        #f4f6f8;
+
+      border:
+        1px
+        solid
+        #e2e6eb;
+
+      border-radius:
+        17px;
+
+    }
+
+
+    .price-label {
+
+      color:
+        #667085;
+
+      font-size:
+        clamp(16px, 4.5vw, 20px);
+
+      line-height:
+        1.2;
+
+      font-weight:
+        850;
+
+    }
+
+
+    .price-value {
+
+      margin-top:
+        4px;
+
+      color:
+        #0b1220;
+
+      font-size:
+        clamp(48px, 15vw, 70px);
+
+      line-height:
+        1.0;
+
+      font-weight:
+        950;
+
+      letter-spacing:
+        -2px;
+
+      white-space:
+        nowrap;
+
+    }
+
+
+
+    /* =====================================================
+       정보 영역
+
+       큰 글씨 2열
+    ===================================================== */
+
+    .info-area {
+
+      flex:
+        1 1 auto;
+
+      min-height:
+        0;
+
+      margin-top:
+        12px;
+
+      overflow-y:
+        auto;
+
+    }
+
+
+    .info-grid {
+
+      display:
+        grid;
+
+      grid-template-columns:
+        1fr
+        1fr;
+
+      gap:
+        9px;
+
+      align-content:
+        start;
+
+    }
+
+
+    .info-box {
+
+      min-width:
+        0;
+
+      padding:
+        13px;
+
+      background:
+        #ffffff;
+
+      border:
+        2px
+        solid
+        #eaecf0;
+
+      border-radius:
+        14px;
+
+    }
+
+
+    .info-box.full {
+
+      grid-column:
+        1 /
+        -1;
+
+    }
+
+
+    .info-label {
+
+      color:
+        #667085;
+
+      font-size:
+        clamp(13px, 3.8vw, 17px);
+
+      line-height:
+        1.25;
+
+      font-weight:
+        800;
+
+    }
+
+
+    .info-value {
+
+      margin-top:
+        5px;
+
+      color:
+        #101828;
+
+      font-size:
+        clamp(18px, 5vw, 25px);
+
+      line-height:
+        1.4;
+
+      font-weight:
+        900;
+
+      word-break:
+        break-word;
+
+      overflow-wrap:
+        anywhere;
+
+    }
+
+
+    .money-value {
+
+      font-size:
+        clamp(20px, 5.5vw, 28px);
+
+      white-space:
+        nowrap;
+
+    }
+
+
+    .reason-value {
+
+      font-size:
+        clamp(16px, 4.5vw, 22px);
+
+    }
+
+
+
+    /* =====================================================
+       액션 버튼
+
+       화면 하단에서 매우 크게
+    ===================================================== */
+
+    .actions {
+
+      flex:
+        0 0 auto;
+
+      margin-top:
+        11px;
+
+      padding-top:
+        11px;
+
+      border-top:
+        2px
+        solid
+        #edf0f3;
+
+    }
+
+
+    .action-btn {
+
+      width:
+        100%;
+
+      min-height:
+        clamp(60px, 16vw, 78px);
+
+      border:
+        0;
+
+      border-radius:
+        14px;
+
+      font-size:
+        clamp(20px, 5.8vw, 27px);
+
+      line-height:
+        1.2;
+
+      font-weight:
+        950;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    .save-btn {
+
+      background:
+        #e9edf1;
+
+      color:
+        #111827;
+
+    }
+
+
+    .next-btn {
+
+      margin-top:
+        10px;
+
+      background:
+        #111827;
+
+      color:
+        white;
+
+    }
+
+
+    .save-message {
+
+      min-height:
+        19px;
+
+      margin-top:
+        5px;
+
+      color:
+        var(--success);
+
+      font-size:
+        13px;
+
+      font-weight:
+        850;
+
+    }
+
+
+
+    /* =====================================================
+       좁은 화면
+
+       여기서도 폰트를 줄이지 않음
+       대신 정보박스만 한 줄로
+    ===================================================== */
+
+    @media (max-width: 370px) {
+
+      .info-grid {
+
+        grid-template-columns:
+          1fr;
+
+      }
+
+
+      .info-box.full {
+
+        grid-column:
+          auto;
+
+      }
+
+    }
+
+
+
+    /* =====================================================
+       매우 큰 화면
+
+       PC에서도 적당히 보기 좋게
+    ===================================================== */
+
+    @media (min-width: 700px) {
+
+      .main {
+
+        max-width:
+          900px;
+
+        width:
+          100%;
+
+        margin:
+          0
+          auto;
+
+      }
+
+      .product-name {
+
+        font-size:
+          34px;
+
+      }
+
+      .price-value {
+
+        font-size:
+          60px;
+
+      }
+
     }
 
   </style>
@@ -190,131 +990,107 @@
 <body>
 
 
-<div class="wrap">
+<div class="app">
 
 
-  <h1>
-    반품 상품 바코드 스캐너
-  </h1>
+  <!-- ===================================================
+       HEADER
+  ==================================================== -->
+
+  <header class="header">
+
+    <h1 class="header-title">
+      반품 상품 조회기
+    </h1>
 
 
-  <div class="sub">
-    실시간 카메라 스캔
-  </div>
+    <div class="header-subtitle">
+      1단계 · FEED 상품 조회
+    </div>
+
+  </header>
 
 
 
-  <!-- =========================================
-       카메라
-  ========================================== -->
+  <!-- ===================================================
+       MAIN
+  ==================================================== -->
 
-  <div class="panel">
+  <main class="main">
 
-    <div class="title">
-      📷 바코드 스캔
+
+    <!-- =================================================
+         검색
+    ================================================== -->
+
+    <section class="search-panel">
+
+
+      <div class="search-label">
+
+        바코드 번호
+
+      </div>
+
+
+      <input
+        id="barcode"
+        class="barcode-input"
+        type="text"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="바코드 입력"
+      >
+
+
+      <button
+        class="search-btn"
+        type="button"
+        onclick="searchProduct()"
+      >
+
+        상품 조회
+
+      </button>
+
+
+      <div
+        id="status"
+        class="status"
+      ></div>
+
+
+    </section>
+
+
+
+    <!-- =================================================
+         RESULT
+    ================================================== -->
+
+    <div id="resultArea">
+
+
+      <div class="empty-state">
+
+        <div>
+
+          바코드를 입력하세요
+
+          <br>
+
+          또는 카메라 스캐너에서
+          바코드를 인식하세요.
+
+        </div>
+
+      </div>
+
+
     </div>
 
 
-    <div class="description">
-
-      제품의 바코드를
-      화면 중앙에 맞춰주세요.
-
-      <br>
-
-      바코드가 인식되면
-      자동으로 상품 조회 화면으로 이동합니다.
-
-    </div>
-
-
-    <!--
-      카메라 영상이 표시되는 곳
-    -->
-
-    <div id="reader"></div>
-
-
-    <div class="guide">
-
-      바코드를 화면 중앙의
-      가로 영역에 맞춰주세요.
-
-      <br>
-
-      너무 가까이 붙이지 말고
-      바코드 전체가 화면에 보이게 해주세요.
-
-    </div>
-
-
-    <div
-      id="status"
-      class="status"
-    >
-
-      카메라를 시작하는 중입니다...
-
-    </div>
-
-  </div>
-
-
-
-  <!-- =========================================
-       직접 입력
-  ========================================== -->
-
-  <div class="panel">
-
-    <div class="manual-title">
-      바코드 직접 입력
-    </div>
-
-
-    <div class="manual-description">
-
-      카메라가 인식하지 못하는 경우
-      바코드 번호를 직접 입력할 수 있습니다.
-
-    </div>
-
-
-    <input
-      id="manualBarcode"
-      class="input"
-      type="text"
-      inputmode="numeric"
-      autocomplete="off"
-      placeholder="예: 8801234567890"
-    >
-
-
-    <button
-      class="btn btn-main"
-      type="button"
-      onclick="openProductPage()"
-    >
-
-      상품 조회
-
-    </button>
-
-  </div>
-
-
-
-  <div class="info">
-
-    이 페이지에서는
-    상품 데이터를 저장하지 않습니다.
-
-    <br>
-
-    카메라에서 인식한 바코드 번호만
-    기존 상품 조회 프로그램으로 전달합니다.
-
-  </div>
+  </main>
 
 
 </div>
@@ -324,434 +1100,844 @@
 <script>
 
 
-  /*
-   * =====================================================
-   * Google Apps Script 주소
-   * =====================================================
-   *
-   * 이미 사용자님의 실제 주소를 넣어두었습니다.
-   */
+  /* =====================================================
+     변수
+  ===================================================== */
 
-  const APPS_SCRIPT_URL =
-    "https://script.google.com/macros/s/AKfycbzv1lpGYxJvBGeMB3P43O3fhFq4dGVQ5CpdIF37-9_xRTZrtn6vIKg1hg6eydv9YTVb/exec";
+  let currentResults = [];
 
 
-  /*
-   * 이미 한 번 인식한 바코드를
-   * 계속 반복해서 처리하지 않도록 합니다.
-   */
-
-  let detected = false;
+  const barcodeInput =
+    document.getElementById(
+      "barcode"
+    );
 
 
-  /*
-   * 카메라 객체
-   */
+  const statusEl =
+    document.getElementById(
+      "status"
+    );
 
-  let scanner = null;
+
+  const resultArea =
+    document.getElementById(
+      "resultArea"
+    );
 
 
 
-  /*
-   * =====================================================
-   * Google Apps Script 상품조회 화면으로 이동
-   * =====================================================
-   */
+  /* =====================================================
+     금액 포맷
 
-  function openProductPage(barcode) {
+     6759
+     →
+     ₩6,759
+  ===================================================== */
 
-
-    /*
-     * 카메라 인식값이 없다면
-     * 직접 입력값 사용
-     */
-
-    let value =
-      barcode ||
-      document
-        .getElementById("manualBarcode")
-        .value
-        .trim();
+  function formatMoney(value) {
 
 
-    /*
-     * 숫자만 남김
-     */
+    if (
+      value === null ||
+      value === undefined ||
+      value === ""
+    ) {
 
-    value =
-      String(value)
-      .replace(/\D/g, "");
-
-
-    /*
-     * 입력값이 없다면
-     * 이동하지 않음
-     */
-
-    if (!value) {
-
-      document
-        .getElementById("status")
-        .innerHTML =
-          '<div class="error">' +
-          '바코드 번호를 입력해주세요.' +
-          '</div>';
-
-      return;
+      return "-";
 
     }
 
 
-    /*
-     * Google Apps Script URL에
-     * barcode라는 이름으로 번호 전달
-     */
-
-    const target =
-      new URL(APPS_SCRIPT_URL);
-
-
-    target.searchParams.set(
-      "barcode",
-      value
-    );
-
-
-    /*
-     * 카메라 중지
-     */
-
-    stopCamera();
-
-
-    /*
-     * Google Apps Script 상품조회 화면 이동
-     */
-
-    window.location.href =
-      target.toString();
-
-  }
-
-
-
-  /*
-   * =====================================================
-   * 카메라 시작
-   * =====================================================
-   */
-
-  async function startCamera() {
-
-
-    try {
-
-
-      document
-        .getElementById("status")
-        .textContent =
-          "카메라를 시작하는 중입니다...";
-
-
-      /*
-       * 스캐너 객체 생성
-       */
-
-      scanner =
-        new Html5Qrcode(
-          "reader"
+    const cleaned =
+      String(value)
+        .replace(
+          /[^0-9.-]/g,
+          ""
         );
 
 
-      /*
-       * 인식할 바코드 종류
-       */
+    const number =
+      Number(cleaned);
 
-      const formats = [
 
-        Html5QrcodeSupportedFormats.EAN_13,
+    if (
+      Number.isNaN(number)
+    ) {
 
-        Html5QrcodeSupportedFormats.EAN_8,
-
-        Html5QrcodeSupportedFormats.UPC_A,
-
-        Html5QrcodeSupportedFormats.UPC_E,
-
-        Html5QrcodeSupportedFormats.CODE_128,
-
-        Html5QrcodeSupportedFormats.ITF
-
-      ];
-
-
-      /*
-       * 화면 중앙에 스캔 영역을 만듭니다.
-       */
-
-      const config = {
-
-        fps: 12,
-
-        qrbox:
-          function(
-            width,
-            height
-          ) {
-
-
-            return {
-
-              width:
-                Math.floor(
-                  width * 0.90
-                ),
-
-              height:
-                Math.floor(
-                  height * 0.32
-                )
-
-            };
-
-          },
-
-        formatsToSupport:
-          formats
-
-      };
-
-
-      /*
-       * 후면 카메라를 우선 사용
-       */
-
-      await scanner.start(
-
-        {
-          facingMode:
-            "environment"
-        },
-
-        config,
-
-
-        /*
-         * 바코드를 발견했을 때
-         */
-
-        function(
-          decodedText,
-          decodedResult
-        ) {
-
-
-          /*
-           * 중복 인식 방지
-           */
-
-          if (detected) {
-
-            return;
-
-          }
-
-
-          detected = true;
-
-
-          /*
-           * 숫자만 추출
-           */
-
-          const barcode =
-            String(decodedText)
-            .replace(/\D/g, "");
-
-
-          if (!barcode) {
-
-            detected = false;
-
-            return;
-
-          }
-
-
-          /*
-           * 사용자에게 표시
-           */
-
-          document
-            .getElementById("status")
-            .innerHTML =
-
-              '<span class="success">' +
-
-              "✓ 바코드 인식 성공<br>" +
-
-              barcode +
-
-              "<br><br>" +
-
-              "상품 조회기로 이동합니다..." +
-
-              "</span>";
-
-
-          /*
-           * 잠시 보여준 뒤 이동
-           */
-
-          setTimeout(
-            function() {
-
-              openProductPage(
-                barcode
-              );
-
-            },
-            500
-          );
-
-        },
-
-
-        /*
-         * 인식에 실패하는 모든 프레임에서
-         * 호출될 수 있으므로 아무것도 하지 않습니다.
-         */
-
-        function(errorMessage) {
-
-        }
-
+      return escapeHtml(
+        String(value)
       );
-
-
-      /*
-       * 정상적으로 카메라가 켜짐
-       */
-
-      document
-        .getElementById("status")
-        .innerHTML =
-
-          '<span class="success">' +
-
-          "✓ 카메라가 켜졌습니다.<br>" +
-
-          "바코드를 화면 중앙에 맞춰주세요." +
-
-          "</span>";
-
 
     }
 
 
-    catch (error) {
-
-
-      console.error(
-        "Camera error:",
-        error
-      );
-
-
-      document
-        .getElementById("status")
-        .innerHTML =
-
-          '<div class="error">' +
-
-          "카메라를 시작하지 못했습니다." +
-
-          "<br><br>" +
-
-          "① 카메라 권한을 허용했는지 확인하세요.<br>" +
-
-          "② Safari 또는 Chrome으로 접속하세요.<br>" +
-
-          "③ 주소가 https://로 시작하는지 확인하세요." +
-
-          "</div>";
-
-    }
+    return (
+      "₩" +
+      Math.round(
+        number
+      ).toLocaleString(
+        "ko-KR"
+      )
+    );
 
   }
 
 
 
-  /*
-   * =====================================================
-   * 카메라 종료
-   * =====================================================
-   */
+  /* =====================================================
+     Enter
+  ===================================================== */
 
-  function stopCamera() {
+  barcodeInput.addEventListener(
+
+    "keydown",
+
+    function(event) {
+
+      if (
+        event.key === "Enter"
+      ) {
+
+        searchProduct();
+
+      }
+
+    }
+
+  );
 
 
-    if (!scanner) {
+
+  /* =====================================================
+     상품 검색
+  ===================================================== */
+
+  function searchProduct() {
+
+
+    const barcode =
+      barcodeInput.value.trim();
+
+
+    if (!barcode) {
+
+      statusEl.textContent =
+        "바코드 번호를 입력하세요.";
+
+      barcodeInput.focus();
 
       return;
 
     }
 
 
-    scanner
-      .stop()
-      .catch(
-        function(error) {
+    statusEl.textContent =
+      "상품 정보를 불러오는 중입니다...";
 
-          console.log(
-            "Camera stop:",
-            error
-          );
 
-        }
+    google.script.run
+
+      .withSuccessHandler(
+        renderResults
+      )
+
+      .withFailureHandler(
+        showError
+      )
+
+      .searchBarcode(
+        barcode
       );
 
   }
 
 
 
-  /*
-   * =====================================================
-   * 직접입력 + Enter
-   * =====================================================
-   */
+  /* =====================================================
+     상품 결과
+  ===================================================== */
 
-  document
-    .getElementById("manualBarcode")
-    .addEventListener(
-      "keydown",
-      function(event) {
+  function renderResults(data) {
 
-        if (
-          event.key === "Enter"
-        ) {
 
-          openProductPage();
+    statusEl.textContent =
+      "";
 
-        }
+
+    /*
+     * 검색 실패
+     */
+
+    if (
+      !data ||
+      !data.found
+    ) {
+
+
+      currentResults = [];
+
+
+      const searchedBarcode =
+        data &&
+        data.barcode
+          ? data.barcode
+          : barcodeInput.value;
+
+
+      resultArea.innerHTML =
+
+        `
+
+        <div class="empty-state">
+
+          <div>
+
+            <b>
+              ${escapeHtml(
+                searchedBarcode
+              )}
+            </b>
+
+            <br><br>
+
+            FEED에서 상품을 찾지 못했습니다.
+
+            <br><br>
+
+            바코드 번호를 확인해주세요.
+
+          </div>
+
+        </div>
+
+        `;
+
+
+      return;
+
+    }
+
+
+
+    /*
+     * 검색 결과 저장
+     */
+
+    currentResults =
+      data.results || [];
+
+
+
+    /*
+     * 결과 시작
+     */
+
+    let html =
+
+      `
+
+      <div class="result-count">
+
+        바코드
+        <b>
+          ${escapeHtml(
+            data.barcode
+          )}
+        </b>
+
+        ·
+        ${data.count}건
+
+      </div>
+
+      `;
+
+
+
+    /*
+     * 결과 하나씩 생성
+     */
+
+    data.results.forEach(
+
+      function(
+        item,
+        index
+      ) {
+
+
+        html +=
+
+          `
+
+          <section class="product-dashboard">
+
+
+            <!-- =============================
+                 상품명
+            ============================== -->
+
+            <div>
+
+              <h2 class="product-name">
+
+                ${escapeHtml(
+                  item.description ||
+                  "(상품명 없음)"
+                )}
+
+              </h2>
+
+
+              <div class="product-barcode">
+
+                BARCODE:
+                ${escapeHtml(
+                  item.barcode ||
+                  data.barcode ||
+                  "-"
+                )}
+
+              </div>
+
+            </div>
+
+
+
+            <!-- =============================
+                 Feed 가격
+            ============================== -->
+
+            <div class="price-area">
+
+
+              <div class="price-label">
+
+                FEED 기준가격
+
+              </div>
+
+
+              <div class="price-value">
+
+                ${formatMoney(
+                  item.unitPrice
+                )}
+
+              </div>
+
+
+            </div>
+
+
+
+            <!-- =============================
+                 상세정보
+            ============================== -->
+
+            <div class="info-area">
+
+
+              <div class="info-grid">
+
+
+                <!-- 수량 -->
+
+                <div class="info-box">
+
+                  <div class="info-label">
+
+                    수량
+
+                  </div>
+
+
+                  <div class="info-value">
+
+                    ${escapeHtml(
+                      item.quantity ||
+                      "-"
+                    )}
+
+                  </div>
+
+                </div>
+
+
+
+                <!-- 총액 -->
+
+                <div class="info-box">
+
+                  <div class="info-label">
+
+                    FEED 총액
+
+                  </div>
+
+
+                  <div class="info-value money-value">
+
+                    ${formatMoney(
+                      item.salesPrice
+                    )}
+
+                  </div>
+
+                </div>
+
+
+
+                <!-- LOT -->
+
+                <div class="info-box">
+
+                  <div class="info-label">
+
+                    LOT
+
+                  </div>
+
+
+                  <div class="info-value">
+
+                    ${escapeHtml(
+                      item.lot ||
+                      "-"
+                    )}
+
+                  </div>
+
+                </div>
+
+
+
+                <!-- 카테고리 -->
+
+                <div class="info-box">
+
+                  <div class="info-label">
+
+                    카테고리
+
+                  </div>
+
+
+                  <div class="info-value">
+
+                    ${escapeHtml(
+                      item.category ||
+                      "-"
+                    )}
+
+                  </div>
+
+                </div>
+
+
+
+                <!-- 반품사유 -->
+
+                <div class="info-box full">
+
+                  <div class="info-label">
+
+                    반품사유
+
+                  </div>
+
+
+                  <div class="info-value reason-value">
+
+                    ${escapeHtml(
+                      item.reason ||
+                      "-"
+                    )}
+
+                  </div>
+
+                </div>
+
+
+              </div>
+
+            </div>
+
+
+
+            <!-- =============================
+                 버튼
+            ============================== -->
+
+            <div class="actions">
+
+
+              <!-- 저장 -->
+
+              <button
+                id="save-button-${index}"
+                class="action-btn save-btn"
+                type="button"
+                onclick="saveItem(${index})"
+              >
+
+                조회 기록 저장
+
+              </button>
+
+
+              <div
+                id="save-${index}"
+                class="save-message"
+              ></div>
+
+
+
+              <!-- 다음 상품 -->
+
+              <button
+                class="action-btn next-btn"
+                type="button"
+                onclick="goToScanner()"
+              >
+
+                📷 다음 상품 스캔
+
+              </button>
+
+
+            </div>
+
+
+          </section>
+
+          `;
 
       }
+
     );
 
 
+    /*
+     * 결과 화면
+     */
 
-  /*
-   * =====================================================
-   * 페이지가 열리면 카메라 시작
-   * =====================================================
-   */
+    resultArea.innerHTML =
+      html;
 
-  window.addEventListener(
-    "load",
-    function() {
+  }
 
-      startCamera();
+
+
+  /* =====================================================
+     저장
+  ===================================================== */
+
+  function saveItem(index) {
+
+
+    const item =
+      currentResults[index];
+
+
+    if (!item) {
+
+      return;
 
     }
+
+
+    const button =
+      document.getElementById(
+        "save-button-" + index
+      );
+
+
+    const message =
+      document.getElementById(
+        "save-" + index
+      );
+
+
+    if (button) {
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        "저장 중...";
+
+    }
+
+
+    google.script.run
+
+      .withSuccessHandler(
+
+        function(text) {
+
+
+          if (button) {
+
+            button.disabled =
+              false;
+
+            button.textContent =
+              "조회 기록 저장";
+
+          }
+
+
+          if (message) {
+
+            message.textContent =
+              "✓ " +
+              text;
+
+          }
+
+        }
+
+      )
+
+      .withFailureHandler(
+
+        function(error) {
+
+
+          if (button) {
+
+            button.disabled =
+              false;
+
+            button.textContent =
+              "조회 기록 저장";
+
+          }
+
+
+          if (message) {
+
+            message.innerHTML =
+
+              '<div class="error">' +
+
+              escapeHtml(
+                error.message ||
+                String(error)
+              ) +
+
+              '</div>';
+
+          }
+
+        }
+
+      )
+
+      .saveHistory(
+        item
+      );
+
+  }
+
+
+
+  /* =====================================================
+     다음 상품 스캔
+
+     브라우저 기록에 결과 페이지가 계속
+     쌓이는 것을 줄이기 위해 replace 사용
+  ===================================================== */
+
+  function goToScanner() {
+
+
+    const scannerUrl =
+      "https://kshflame-jpg.github.io/return-barcode-scanner/";
+
+
+    window.location.replace(
+      scannerUrl
+    );
+
+  }
+
+
+
+  /* =====================================================
+     오류
+  ===================================================== */
+
+  function showError(error) {
+
+
+    statusEl.textContent =
+      "";
+
+
+    resultArea.innerHTML =
+
+      `
+
+      <div class="error">
+
+        ${escapeHtml(
+          error.message ||
+          String(error)
+        )}
+
+      </div>
+
+      `;
+
+  }
+
+
+
+  /* =====================================================
+     HTML 특수문자 처리
+  ===================================================== */
+
+  function escapeHtml(value) {
+
+
+    return String(
+      value ?? ""
+    )
+
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+
+      .replace(
+        /</g,
+        "&lt;"
+      )
+
+      .replace(
+        />/g,
+        "&gt;"
+      )
+
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+
+  }
+
+
+
+  /* =====================================================
+     GitHub 카메라 페이지에서
+
+     ?barcode=8801234567890
+
+     형태로 들어온 경우
+
+     자동으로 입력하고 검색
+  ===================================================== */
+
+  google.script.url.getLocation(
+
+    function(location) {
+
+
+      if (
+        !location ||
+        !location.parameter
+      ) {
+
+        return;
+
+      }
+
+
+      const barcode =
+        location.parameter.barcode ||
+        "";
+
+
+      if (!barcode) {
+
+        return;
+
+      }
+
+
+      const cleanBarcode =
+        String(
+          barcode
+        ).replace(
+          /\D/g,
+          ""
+        );
+
+
+      if (!cleanBarcode) {
+
+        return;
+
+      }
+
+
+      /*
+       * 입력창 자동 입력
+       */
+
+      barcodeInput.value =
+        cleanBarcode;
+
+
+      /*
+       * 안내
+       */
+
+      statusEl.innerHTML =
+
+        `
+
+        <span class="success-status">
+
+          카메라 인식 완료 ·
+          ${escapeHtml(
+            cleanBarcode
+          )}
+
+          <br>
+
+          상품 정보를 불러오는 중입니다...
+
+        </span>
+
+        `;
+
+
+      /*
+       * 자동 검색
+       */
+
+      setTimeout(
+
+        function() {
+
+          searchProduct();
+
+        },
+
+        400
+
+      );
+
+    }
+
   );
 
 
