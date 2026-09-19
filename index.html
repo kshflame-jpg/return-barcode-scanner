@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>반품 상품 바코드 스캐너</title>
+
+
+  <!--
+    실시간 바코드 인식 라이브러리
+  -->
+  <script
+    src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js">
+  </script>
+
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #f5f6f8;
+      color: #1f2937;
+      font-family:
+        Arial,
+        "Noto Sans KR",
+        "Malgun Gothic",
+        sans-serif;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 620px;
+      margin: 0 auto;
+      padding: 18px 12px 40px;
+    }
+
+    h1 {
+      margin: 5px 0 5px;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .sub {
+      margin-bottom: 16px;
+      color: #667085;
+      font-size: 13px;
+    }
+
+    .panel {
+      padding: 16px;
+      margin-bottom: 14px;
+      border-radius: 18px;
+      background: #ffffff;
+      box-shadow:
+        0 4px 18px rgba(0, 0, 0, 0.06);
+    }
+
+    .title {
+      margin-bottom: 8px;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .description {
+      margin-bottom: 14px;
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    #reader {
+      width: 100%;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #111827;
+    }
+
+    #reader video {
+      width: 100% !important;
+      height: auto !important;
+      object-fit: cover;
+    }
+
+    .guide {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #f2f4f7;
+      text-align: center;
+      color: #475467;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .status {
+      min-height: 24px;
+      margin-top: 12px;
+      text-align: center;
+      color: #667085;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .success {
+      color: #027a48;
+      font-weight: 800;
+    }
+
+    .error {
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #fef3f2;
+      color: #b42318;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .manual-title {
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: 800;
+    }
+
+    .manual-description {
+      margin-bottom: 10px;
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .input {
+      width: 100%;
+      height: 54px;
+      padding: 0 14px;
+      border:
+        1px solid #d0d5dd;
+      border-radius: 12px;
+      outline: none;
+      font-size: 19px;
+    }
+
+    .input:focus {
+      border-color: #667085;
+    }
+
+    .btn {
+      width: 100%;
+      height: 52px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-main {
+      background: #111827;
+      color: white;
+    }
+
+    .info {
+      padding: 12px;
+      border:
+        1px solid #e4e7ec;
+      border-radius: 12px;
+      color: #667085;
+      background: white;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+  </style>
+
+</head>
+
+
+<body>
+
+
+<div class="wrap">
+
+
+  <h1>
+    반품 상품 바코드 스캐너
+  </h1>
+
+
+  <div class="sub">
+    실시간 카메라 스캔
+  </div>
+
+
+
+  <!-- =========================================
+       카메라
+  ========================================== -->
+
+  <div class="panel">
+
+    <div class="title">
+      📷 바코드 스캔
+    </div>
+
+
+    <div class="description">
+
+      제품의 바코드를
+      화면 중앙에 맞춰주세요.
+
+      <br>
+
+      바코드가 인식되면
+      자동으로 상품 조회 화면으로 이동합니다.
+
+    </div>
+
+
+    <!--
+      카메라 영상이 표시되는 곳
+    -->
+
+    <div id="reader"></div>
+
+
+    <div class="guide">
+
+      바코드를 화면 중앙의
+      가로 영역에 맞춰주세요.
+
+      <br>
+
+      너무 가까이 붙이지 말고
+      바코드 전체가 화면에 보이게 해주세요.
+
+    </div>
+
+
+    <div
+      id="status"
+      class="status"
+    >
+
+      카메라를 시작하는 중입니다...
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =========================================
+       직접 입력
+  ========================================== -->
+
+  <div class="panel">
+
+    <div class="manual-title">
+      바코드 직접 입력
+    </div>
+
+
+    <div class="manual-description">
+
+      카메라가 인식하지 못하는 경우
+      바코드 번호를 직접 입력할 수 있습니다.
+
+    </div>
+
+
+    <input
+      id="manualBarcode"
+      class="input"
+      type="text"
+      inputmode="numeric"
+      autocomplete="off"
+      placeholder="예: 8801234567890"
+    >
+
+
+    <button
+      class="btn btn-main"
+      type="button"
+      onclick="openProductPage()"
+    >
+
+      상품 조회
+
+    </button>
+
+  </div>
+
+
+
+  <div class="info">
+
+    이 페이지에서는
+    상품 데이터를 저장하지 않습니다.
+
+    <br>
+
+    카메라에서 인식한 바코드 번호만
+    기존 상품 조회 프로그램으로 전달합니다.
+
+  </div>
+
+
+</div>
+
+
+
+<script>
+
+
+  /*
+   * =====================================================
+   * Google Apps Script 주소
+   * =====================================================
+   *
+   * 이미 사용자님의 실제 주소를 넣어두었습니다.
+   */
+
+  const APPS_SCRIPT_URL =
+    "https://script.google.com/macros/s/AKfycbzv1lpGYxJvBGeMB3P43O3fhFq4dGVQ5CpdIF37-9_xRTZrtn6vIKg1hg6eydv9YTVb/exec";
+
+
+  /*
+   * 이미 한 번 인식한 바코드를
+   * 계속 반복해서 처리하지 않도록 합니다.
+   */
+
+  let detected = false;
+
+
+  /*
+   * 카메라 객체
+   */
+
+  let scanner = null;
+
+
+
+  /*
+   * =====================================================
+   * Google Apps Script 상품조회 화면으로 이동
+   * =====================================================
+   */
+
+  function openProductPage(barcode) {
+
+
+    /*
+     * 카메라 인식값이 없다면
+     * 직접 입력값 사용
+     */
+
+    let value =
+      barcode ||
+      document
+        .getElementById("manualBarcode")
+        .value
+        .trim();
+
+
+    /*
+     * 숫자만 남김
+     */
+
+    value =
+      String(value)
+      .replace(/\D/g, "");
+
+
+    /*
+     * 입력값이 없다면
+     * 이동하지 않음
+     */
+
+    if (!value) {
+
+      document
+        .getElementById("status")
+        .innerHTML =
+          '<div class="error">' +
+          '바코드 번호를 입력해주세요.' +
+          '</div>';
+
+      return;
+
+    }
+
+
+    /*
+     * Google Apps Script URL에
+     * barcode라는 이름으로 번호 전달
+     */
+
+    const target =
+      new URL(APPS_SCRIPT_URL);
+
+
+    target.searchParams.set(
+      "barcode",
+      value
+    );
+
+
+    /*
+     * 카메라 중지
+     */
+
+    stopCamera();
+
+
+    /*
+     * Google Apps Script 상품조회 화면 이동
+     */
+
+    window.location.href =
+      target.toString();
+
+  }
+
+
+
+  /*
+   * =====================================================
+   * 카메라 시작
+   * =====================================================
+   */
+
+  async function startCamera() {
+
+
+    try {
+
+
+      document
+        .getElementById("status")
+        .textContent =
+          "카메라를 시작하는 중입니다...";
+
+
+      /*
+       * 스캐너 객체 생성
+       */
+
+      scanner =
+        new Html5Qrcode(
+          "reader"
+        );
+
+
+      /*
+       * 인식할 바코드 종류
+       */
+
+      const formats = [
+
+        Html5QrcodeSupportedFormats.EAN_13,
+
+        Html5QrcodeSupportedFormats.EAN_8,
+
+        Html5QrcodeSupportedFormats.UPC_A,
+
+        Html5QrcodeSupportedFormats.UPC_E,
+
+        Html5QrcodeSupportedFormats.CODE_128,
+
+        Html5QrcodeSupportedFormats.ITF
+
+      ];
+
+
+      /*
+       * 화면 중앙에 스캔 영역을 만듭니다.
+       */
+
+      const config = {
+
+        fps: 12,
+
+        qrbox:
+          function(
+            width,
+            height
+          ) {
+
+
+            return {
+
+              width:
+                Math.floor(
+                  width * 0.90
+                ),
+
+              height:
+                Math.floor(
+                  height * 0.32
+                )
+
+            };
+
+          },
+
+        formatsToSupport:
+          formats
+
+      };
+
+
+      /*
+       * 후면 카메라를 우선 사용
+       */
+
+      await scanner.start(
+
+        {
+          facingMode:
+            "environment"
+        },
+
+        config,
+
+
+        /*
+         * 바코드를 발견했을 때
+         */
+
+        function(
+          decodedText,
+          decodedResult
+        ) {
+
+
+          /*
+           * 중복 인식 방지
+           */
+
+          if (detected) {
+
+            return;
+
+          }
+
+
+          detected = true;
+
+
+          /*
+           * 숫자만 추출
+           */
+
+          const barcode =
+            String(decodedText)
+            .replace(/\D/g, "");
+
+
+          if (!barcode) {
+
+            detected = false;
+
+            return;
+
+          }
+
+
+          /*
+           * 사용자에게 표시
+           */
+
+          document
+            .getElementById("status")
+            .innerHTML =
+
+              '<span class="success">' +
+
+              "✓ 바코드 인식 성공<br>" +
+
+              barcode +
+
+              "<br><br>" +
+
+              "상품 조회기로 이동합니다..." +
+
+              "</span>";
+
+
+          /*
+           * 잠시 보여준 뒤 이동
+           */
+
+          setTimeout(
+            function() {
+
+              openProductPage(
+                barcode
+              );
+
+            },
+            500
+          );
+
+        },
+
+
+        /*
+         * 인식에 실패하는 모든 프레임에서
+         * 호출될 수 있으므로 아무것도 하지 않습니다.
+         */
+
+        function(errorMessage) {
+
+        }
+
+      );
+
+
+      /*
+       * 정상적으로 카메라가 켜짐
+       */
+
+      document
+        .getElementById("status")
+        .innerHTML =
+
+          '<span class="success">' +
+
+          "✓ 카메라가 켜졌습니다.<br>" +
+
+          "바코드를 화면 중앙에 맞춰주세요." +
+
+          "</span>";
+
+
+    }
+
+
+    catch (error) {
+
+
+      console.error(
+        "Camera error:",
+        error
+      );
+
+
+      document
+        .getElementById("status")
+        .innerHTML =
+
+          '<div class="error">' +
+
+          "카메라를 시작하지 못했습니다." +
+
+          "<br><br>" +
+
+          "① 카메라 권한을 허용했는지 확인하세요.<br>" +
+
+          "② Safari 또는 Chrome으로 접속하세요.<br>" +
+
+          "③ 주소가 https://로 시작하는지 확인하세요." +
+
+          "</div>";
+
+    }
+
+  }
+
+
+
+  /*
+   * =====================================================
+   * 카메라 종료
+   * =====================================================
+   */
+
+  function stopCamera() {
+
+
+    if (!scanner) {
+
+      return;
+
+    }
+
+
+    scanner
+      .stop()
+      .catch(
+        function(error) {
+
+          console.log(
+            "Camera stop:",
+            error
+          );
+
+        }
+      );
+
+  }
+
+
+
+  /*
+   * =====================================================
+   * 직접입력 + Enter
+   * =====================================================
+   */
+
+  document
+    .getElementById("manualBarcode")
+    .addEventListener(
+      "keydown",
+      function(event) {
+
+        if (
+          event.key === "Enter"
+        ) {
+
+          openProductPage();
+
+        }
+
+      }
+    );
+
+
+
+  /*
+   * =====================================================
+   * 페이지가 열리면 카메라 시작
+   * =====================================================
+   */
+
+  window.addEventListener(
+    "load",
+    function() {
+
+      startCamera();
+
+    }
+  );
+
+
+</script>
+
+
+</body>
+</html>
